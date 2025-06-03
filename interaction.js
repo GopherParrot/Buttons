@@ -1,5 +1,5 @@
 Swal.fire("The Google search engine was created by Aakaanksha—credit goes to her for this incredible tool! Thanks a lot!").then((result) => {
-	Swal.fire("If you hold the button, the alert won't trigger... or just go to settings and disable it ^_^\n\n...Btw you don't need to understand the japanese text, it's not important :)");
+  Swal.fire("If you hold the button, the alert won't trigger... or just go to settings and disable it ^_^\n\n...Btw you don't need to understand the japanese text, it's not important :)");
 });
 
 const button = document.querySelector('.duo-button');
