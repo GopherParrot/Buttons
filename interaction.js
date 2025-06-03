@@ -491,135 +491,456 @@ function absorbBall(big, small, balls, smallIndex) {
 
 updateBalls();
 
-// Search Button Toggle
+// Ensure these elements exist in your HTML
 const enableSearchTabBtn = document.getElementById('enableSearchTabBtn');
 const searchTabBtn = document.getElementById('searchTabBtn');
 
-enableSearchTabBtn.addEventListener('change', () => {
-    searchTabBtn.style.display = enableSearchTabBtn.checked ? 'inline-block' : 'none';
-});
-
-// Search Tab
-searchTabBtn.addEventListener('click', () => {
-    let searchTab = document.querySelector('.search-tab');
-    if (searchTab) {
-        searchTab.style.display = 'flex';
-        return;
-    }
-
-    searchTab = document.createElement('div');
-    searchTab.className = 'search-tab';
-    searchTab.innerHTML = `
-        <div class="search-tab-header">
-            <div class="search-tab-buttons">
-                <button class="search-tab-button close"></button>
-                <button class="search-tab-button minimize"></button>
-                <button class="search-tab-button maximize"></button>
-            </div>
-        </div>
-        <div class="search-tab-content">
-            <iframe src="search.html" title="Google Search"></iframe>
-        </div>
-    `;
-    document.body.appendChild(searchTab);
-
-    makeWindowDraggable(searchTab);
-
-    const closeBtn = searchTab.querySelector('.close');
-    const minimizeBtn = searchTab.querySelector('.minimize');
-    const maximizeBtn = searchTab.querySelector('.maximize');
-
-    closeBtn.addEventListener('click', () => {
-        searchTab.remove();
+if (enableSearchTabBtn && searchTabBtn) {
+    enableSearchTabBtn.addEventListener('change', () => {
+        searchTabBtn.style.display = enableSearchTabBtn.checked ? 'inline-block' : 'none';
     });
 
-    minimizeBtn.addEventListener('click', () => {
-        searchTab.style.display = 'none';
-    });
-
-    maximizeBtn.addEventListener('click', () => {
-        if (searchTab.style.width === '100%') {
-            searchTab.style.width = '80%';
-            searchTab.style.maxWidth = '800px';
-            searchTab.style.height = '60%';
-            searchTab.style.maxHeight = '600px';
-            searchTab.style.top = '50%';
-            searchTab.style.left = '50%';
-            searchTab.style.transform = 'translate(-50%, -50%)';
-        } else {
-            searchTab.style.width = '100%';
-            searchTab.style.maxWidth = 'none';
-            searchTab.style.height = '100%';
-            searchTab.style.maxHeight = 'none';
-            searchTab.style.top = '0';
-            searchTab.style.left = '0';
-            searchTab.style.transform = 'none';
+    searchTabBtn.addEventListener('click', () => {
+        let searchTab = document.querySelector('.search-tab');
+        if (searchTab) {
+            searchTab.style.display = 'flex'; // Ensure it's flex when shown
+            return;
         }
-    });
 
-    // Handle Enter key in search form
-    const searchFrame = searchTab.querySelector('iframe');
-    searchFrame.addEventListener('load', () => {
-        const frameDoc = searchFrame.contentDocument || searchFrame.contentWindow.document;
-        const searchInput = frameDoc.querySelector('#mySearch');
-        const searchForm = frameDoc.querySelector('form');
+        searchTab = document.createElement('div');
+        searchTab.className = 'search-tab';
+        // Initial style should ideally be in CSS, but mirroring original logic
+        searchTab.style.top = '50%';
+        searchTab.style.left = '50%';
+        searchTab.style.transform = 'translate(-50%, -50%)';
+        searchTab.style.width = '80%';
+        searchTab.style.maxWidth = '800px';
+        searchTab.style.height = '60%';
+        searchTab.style.maxHeight = '600px';
+        // Add other necessary styles if not fully covered by CSS class .search-tab
+        // e.g., searchTab.style.position = 'fixed';
+        // searchTab.style.backgroundColor = '#fff';
+        // searchTab.style.border = '1px solid #ccc';
+        // searchTab.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+        // searchTab.style.zIndex = '1000';
+        // searchTab.style.display = 'flex';
+        // searchTab.style.flexDirection = 'column';
+        // searchTab.style.borderRadius = '8px';
+        // searchTab.style.overflow = 'hidden';
 
-        if (searchInput && searchForm) {
-            searchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && searchInput.value.trim()) {
-                    e.preventDefault();
-                    searchForm.submit();
+
+        searchTab.innerHTML = `
+            <div class="search-tab-header" style="cursor: move; background-color: #f1f1f1; padding: 10px; border-bottom: 1px solid #ccc; display: flex; justify-content: flex-start; align-items: center;">
+                <div class="search-tab-buttons" style="display: flex;">
+                    <button class="search-tab-button close" style="background-color: #ff5f57; border-radius: 50%; width: 12px; height: 12px; border: none; margin-right: 8px; padding: 0;"></button>
+                    <button class="search-tab-button minimize" style="background-color: #ffbd2e; border-radius: 50%; width: 12px; height: 12px; border: none; margin-right: 8px; padding: 0;"></button>
+                    <button class="search-tab-button maximize" style="background-color: #28c940; border-radius: 50%; width: 12px; height: 12px; border: none; padding: 0;"></button>
+                </div>
+                <span style="margin-left: auto; font-weight: bold; user-select: none;">Search</span>
+            </div>
+            <div class="search-tab-content" style="flex-grow: 1; overflow: hidden;">
+                <iframe src="search.html" title="Google Search" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        `;
+        document.body.appendChild(searchTab);
+
+        makeWindowDraggableAndResizable(searchTab);
+
+        const closeBtn = searchTab.querySelector('.search-tab-button.close');
+        const minimizeBtn = searchTab.querySelector('.search-tab-button.minimize');
+        const maximizeBtn = searchTab.querySelector('.search-tab-button.maximize');
+        const headerElement = searchTab.querySelector('.search-tab-header');
+
+        // Ensure buttons are easily tappable on mobile:
+        // Adding some padding via JS if CSS isn't sufficient.
+        // Best practice is to handle this in CSS with appropriate padding/min-width/min-height.
+        [closeBtn, minimizeBtn, maximizeBtn].forEach(btn => {
+            if (btn) {
+                // btn.style.padding = '8px'; // Example: increase tappable area if needed
+            }
+        });
+
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                searchTab.remove();
+            });
+        }
+
+        if (minimizeBtn) {
+            minimizeBtn.addEventListener('click', () => {
+                searchTab.style.display = 'none';
+            });
+        }
+        
+        let isMaximized = false;
+        let previousDimensions = {};
+
+        if (maximizeBtn) {
+            maximizeBtn.addEventListener('click', () => {
+                if (!isMaximized) {
+                    // Store current dimensions and position before maximizing
+                    previousDimensions = {
+                        width: searchTab.style.width,
+                        height: searchTab.style.height,
+                        left: searchTab.style.left,
+                        top: searchTab.style.top,
+                        transform: searchTab.style.transform,
+                        maxWidth: searchTab.style.maxWidth,
+                        maxHeight: searchTab.style.maxHeight,
+                    };
+
+                    searchTab.style.width = '100%';
+                    searchTab.style.maxWidth = 'none';
+                    searchTab.style.height = '100%';
+                    searchTab.style.maxHeight = 'none';
+                    searchTab.style.top = '0px';
+                    searchTab.style.left = '0px';
+                    searchTab.style.transform = 'none';
+                    isMaximized = true;
+                    if(headerElement) headerElement.style.borderRadius = '0'; // Optional: remove border radius when maximized
+                    searchTab.style.borderRadius = '0';
+
+
+                } else {
+                    // Restore to previous or default dimensions
+                    searchTab.style.width = previousDimensions.width || '80%';
+                    searchTab.style.maxWidth = previousDimensions.maxWidth || '800px';
+                    searchTab.style.height = previousDimensions.height || '60%';
+                    searchTab.style.maxHeight = previousDimensions.maxHeight || '600px';
+                    searchTab.style.top = previousDimensions.top || '50%';
+                    searchTab.style.left = previousDimensions.left || '50%';
+                    searchTab.style.transform = previousDimensions.transform || 'translate(-50%, -50%)';
+                    isMaximized = false;
+                     if(headerElement) headerElement.style.borderTopLeftRadius = '8px'; // Restore
+                     if(headerElement) headerElement.style.borderTopRightRadius = '8px';
+                     searchTab.style.borderRadius = '8px';
+                }
+            });
+        }
+
+        // Handle Enter key in search form
+        const searchFrame = searchTab.querySelector('iframe');
+        if (searchFrame) {
+            searchFrame.addEventListener('load', () => {
+                try {
+                    const frameDoc = searchFrame.contentDocument || searchFrame.contentWindow.document;
+                    const searchInput = frameDoc.querySelector('#mySearch'); // Ensure this ID matches your search.html
+                    const searchForm = frameDoc.querySelector('form'); // Ensure this matches your search.html
+
+                    if (searchInput && searchForm) {
+                        searchInput.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter' && searchInput.value.trim()) {
+                                e.preventDefault();
+                                searchForm.submit();
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.warn("Could not access iframe content for search form:", error);
                 }
             });
         }
     });
-});
-
-// Draggable Window (corrected)
-function makeWindowDraggable(el) {
-    let offsetX = 0, offsetY = 0;
-    const header = el.querySelector('.search-tab-header');
-
-    header.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        offsetX = e.clientX - parseFloat(el.style.left || window.innerWidth / 2);
-        offsetY = e.clientY - parseFloat(el.style.top || window.innerHeight / 2);
-        el.isDragging = true;
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (el.isDragging) {
-            const x = e.clientX - offsetX;
-            const y = e.clientY - offsetY;
-            el.style.left = `${x}px`;
-            el.style.top = `${y}px`;
-            el.style.transform = 'none';
-        }
-    });
-
-    document.addEventListener('mouseup', () => {
-        el.isDragging = false;
-    });
-
-    header.addEventListener('touchstart', (e) => {
-        if (e.cancelable) e.preventDefault();
-        offsetX = e.touches[0].clientX - parseFloat(el.style.left || window.innerWidth / 2);
-        offsetY = e.touches[0].clientY - parseFloat(el.style.top || window.innerHeight / 2);
-        el.isDragging = true;
-    });
-
-    header.addEventListener('touchmove', (e) => {
-        if (e.cancelable) e.preventDefault();
-        if (el.isDragging) {
-            const x = e.touches[0].clientX - offsetX;
-            const y = e.touches[0].clientY - offsetY;
-            el.style.left = `${x}px`;
-            el.style.top = `${y}px`;
-            el.style.transform = 'none';
-        }
-    });
-
-    header.addEventListener('touchend', () => {
-        el.isDragging = false;
-    });
+} else {
+    console.warn("EnableSearchTabBtn or SearchTabBtn not found. UI control will not work.");
 }
+
+
+// Draggable and Resizable Window
+function makeWindowDraggableAndResizable(el) {
+    const header = el.querySelector('.search-tab-header');
+    if (!header) {
+        console.error("Draggable element needs a .search-tab-header child.");
+        return;
+    }
+
+    let offsetX = 0, offsetY = 0;
+    let initialMouseX, initialMouseY, initialWidth, initialHeight, initialLeft, initialTop;
+    let isDragging = false;
+    let resizeDirection = null;
+    const resizeHandleSize = 10; // Pixels for resize detection area
+    const minWidth = 200; // Minimum width for the window
+    const minHeight = 150; // Minimum height for the window
+
+    // Function to determine which edge/corner is being targeted for resize
+    function getResizeDirection(clientX, clientY, rect) {
+        let dir = '';
+        // Check N, S, W, E proximity
+        if (clientY - rect.top < resizeHandleSize && clientY - rect.top > -resizeHandleSize) dir += 'N'; // Allow grabbing from slightly outside too
+        else if (rect.bottom - clientY < resizeHandleSize && rect.bottom - clientY > -resizeHandleSize) dir += 'S';
+        
+        if (clientX - rect.left < resizeHandleSize && clientX - rect.left > -resizeHandleSize) dir += 'W';
+        else if (rect.right - clientX < resizeHandleSize && rect.right - clientX > -resizeHandleSize) dir += 'E';
+
+        // Prioritize corners
+        if (dir.includes('N') && dir.includes('W')) return 'NW';
+        if (dir.includes('N') && dir.includes('E')) return 'NE';
+        if (dir.includes('S') && dir.includes('W')) return 'SW';
+        if (dir.includes('S') && dir.includes('E')) return 'SE';
+        
+        // Return single direction if not a corner
+        if (dir.includes('N')) return 'N';
+        if (dir.includes('S')) return 'S';
+        if (dir.includes('W')) return 'W';
+        if (dir.includes('E')) return 'E';
+        
+        return null; // No resize area
+    }
+
+    // Function to update cursor style based on potential action
+    function updateCursor(clientX, clientY) {
+        if (isDragging || resizeDirection) return; // Don't change cursor if an action is in progress
+
+        const rect = el.getBoundingClientRect();
+        const currentResizeDir = getResizeDirection(clientX, clientY, rect);
+        
+        if (el.style.width === '100%' || el.style.height === '100%') { // If maximized
+            el.style.cursor = 'default';
+            header.style.cursor = 'move'; // Keep header draggable
+            return;
+        }
+
+        if (currentResizeDir) {
+            if (currentResizeDir === 'N' || currentResizeDir === 'S') el.style.cursor = 'ns-resize';
+            else if (currentResizeDir === 'E' || currentResizeDir === 'W') el.style.cursor = 'ew-resize';
+            else if (currentResizeDir === 'NW' || currentResizeDir === 'SE') el.style.cursor = 'nwse-resize';
+            else if (currentResizeDir === 'NE' || currentResizeDir === 'SW') el.style.cursor = 'nesw-resize';
+            header.style.cursor = 'move'; // Ensure header is still 'move'
+        } else {
+            el.style.cursor = 'default';
+            header.style.cursor = 'move';
+        }
+    }
+    
+    // Attach mousemove to the element itself for cursor updates when not actively dragging/resizing
+    el.addEventListener('mousemove', (e) => {
+        updateCursor(e.clientX, e.clientY);
+    });
+    el.addEventListener('mouseleave', () => { // Reset cursor when mouse leaves the element
+        if (!isDragging && !resizeDirection) {
+            el.style.cursor = 'default';
+            header.style.cursor = 'move';
+        }
+    });
+
+
+    function onStart(e) {
+        // Determine if it's a touch event
+        const isTouchEvent = e.type.startsWith('touch');
+        const clientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
+        const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
+
+        const rect = el.getBoundingClientRect();
+        
+        // Check for resize only if not maximized
+        if (el.style.width !== '100%' && el.style.height !== '100%') {
+            resizeDirection = getResizeDirection(clientX, clientY, rect);
+        } else {
+            resizeDirection = null; // No resizing if maximized
+        }
+
+        if (resizeDirection) {
+            if (e.cancelable && isTouchEvent) e.preventDefault(); // Prevent page scroll on touch for resize
+            isDragging = false; // Ensure not also dragging
+
+            initialMouseX = clientX;
+            initialMouseY = clientY;
+            initialWidth = rect.width;
+            initialHeight = rect.height;
+            initialLeft = rect.left;
+            initialTop = rect.top;
+
+            // Convert to pixel positioning if not already
+            el.style.width = `${initialWidth}px`;
+            el.style.height = `${initialHeight}px`;
+            el.style.left = `${initialLeft}px`;
+            el.style.top = `${initialTop}px`;
+            el.style.transform = 'none';
+            el.style.maxWidth = 'none'; // Allow free resize
+            el.style.maxHeight = 'none';
+
+        } else if (header.contains(e.target) || e.target === header) {
+            if (e.cancelable && isTouchEvent) e.preventDefault(); // Prevent page scroll on touch for drag
+            isDragging = true;
+            resizeDirection = null; // Ensure not also resizing
+
+            // Calculate offset from the element's current screen position
+            offsetX = clientX - rect.left;
+            offsetY = clientY - rect.top;
+
+            // Set position explicitly in pixels and remove transform for smooth dragging
+            el.style.left = `${rect.left}px`;
+            el.style.top = `${rect.top}px`;
+            el.style.transform = 'none';
+        } else {
+            return; // Click was not on header or resize handle
+        }
+
+        // Add global listeners for move and end events
+        if (isTouchEvent) {
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onEnd);
+        } else {
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onEnd);
+        }
+    }
+
+    function onMove(e) {
+        const isTouchEvent = e.type.startsWith('touch');
+        if (e.cancelable && isTouchEvent) e.preventDefault();
+
+        const clientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
+        const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
+
+        if (resizeDirection) {
+            let newWidth = initialWidth;
+            let newHeight = initialHeight;
+            let newLeft = initialLeft;
+            let newTop = initialTop;
+
+            const deltaX = clientX - initialMouseX;
+            const deltaY = clientY - initialMouseY;
+
+            if (resizeDirection.includes('E')) newWidth = initialWidth + deltaX;
+            if (resizeDirection.includes('W')) {
+                newWidth = initialWidth - deltaX;
+                newLeft = initialLeft + deltaX;
+            }
+            if (resizeDirection.includes('S')) newHeight = initialHeight + deltaY;
+            if (resizeDirection.includes('N')) {
+                newHeight = initialHeight - deltaY;
+                newTop = initialTop + deltaY;
+            }
+            
+            // Apply minimum dimensions
+            if (newWidth < minWidth) {
+                if (resizeDirection.includes('W')) newLeft = newLeft - (minWidth - newWidth);
+                newWidth = minWidth;
+            }
+            if (newHeight < minHeight) {
+                if (resizeDirection.includes('N')) newTop = newTop - (minHeight - newHeight);
+                newHeight = minHeight;
+            }
+
+            el.style.width = `${newWidth}px`;
+            el.style.height = `${newHeight}px`;
+            el.style.left = `${newLeft}px`;
+            el.style.top = `${newTop}px`;
+
+        } else if (isDragging) {
+            el.style.left = `${clientX - offsetX}px`;
+            el.style.top = `${clientY - offsetY}px`;
+        }
+    }
+
+    function onEnd(e) {
+        const isTouchEvent = e.type.startsWith('touch');
+
+        isDragging = false;
+        resizeDirection = null;
+        // Reset cursor to default or move for header
+        el.style.cursor = 'default';
+        header.style.cursor = 'move';
+
+
+        if (isTouchEvent) {
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
+        } else {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+        }
+    }
+
+    // Attach mousedown/touchstart to the header for dragging
+    header.addEventListener('mousedown', onStart);
+    header.addEventListener('touchstart', onStart, { passive: false }); // passive:false to allow preventDefault
+
+    // Attach mousedown/touchstart to the element itself for resizing
+    // This allows detection of clicks near edges but outside the header
+    el.addEventListener('mousedown', onStart);
+    el.addEventListener('touchstart', onStart, { passive: false });
+}
+
+// Example CSS that would typically be in a .css file
+// This is just for context and to make the example runnable if you don't have these styles.
+/*
+body { font-family: Arial, sans-serif; margin: 0; }
+
+#enableSearchTabBtn { margin: 10px; }
+#searchTabBtn { margin: 10px; padding: 8px 15px; cursor: pointer; }
+
+.search-tab {
+    position: fixed;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden; // Important for border-radius to apply to iframe content visually
+    min-width: 200px; // Corresponds to JS minWidth
+    min-height: 150px; // Corresponds to JS minHeight
+}
+
+.search-tab-header {
+    cursor: move;
+    background-color: #f1f1f1;
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-start; // Aligns buttons to the left
+    align-items: center;
+    user-select: none; // Prevent text selection when dragging header
+    height: 40px; // Example fixed height
+    box-sizing: border-box;
+    border-top-left-radius: 8px; // Match parent
+    border-top-right-radius: 8px; // Match parent
+}
+
+.search-tab-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.search-tab-button { // Basic styling, ensure these are large enough for touch
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    border: none;
+    margin-right: 8px;
+    padding: 0; // Remove default padding
+    display: block; // Or inline-block
+    cursor: pointer;
+    // For better touch targets, consider increasing size or using transparent padding:
+    // min-width: 24px; 
+    // min-height: 24px;
+    // background-clip: content-box; // If using padding to increase area but keep visual small
+}
+.search-tab-button.close { background-color: #ff5f57; }
+.search-tab-button.minimize { background-color: #ffbd2e; }
+.search-tab-button.maximize { background-color: #28c940; }
+
+.search-tab-header span { // Title text
+    margin-left: auto; // Pushes title to the right of buttons
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.search-tab-content {
+    flex-grow: 1; // Allows content to fill remaining space
+    overflow: hidden; // Important for iframe
+    background-color: #fff; // Ensure content area has a background
+}
+
+.search-tab-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+*/
+
