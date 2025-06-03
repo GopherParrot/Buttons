@@ -1,0 +1,127 @@
+<!-- == OVERVIEW ==
+I read a book called "HTML for babies"
+
+
+•     •
+  /_
+ \___/
+  
+-->
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>dear code please work this is so stressful ^_^</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    </head>
+    <body>
+        <div class="settings-container">
+            <img src="https://cdn-icons-png.freepik.com/256/738/738853.png?uid=R196544443&ga=GA1.1.830648840.1744910135&semt=ais_hybrid" id="settingsBtn" class="settings-icon" height="30" width="30">
+        </div>
+
+        <div id="settingsPanel" class="settings-panel">
+            <div class="setting-item">
+                <!--<h3 id="settingTitle">設定</h3>-->
+                <h3 id="settingTitle">Settings</h3>
+            </div>
+
+            <div class="setting-item">
+                <label class="switch">
+                    <input type="checkbox" id="alertToggle" checked>
+                    <span class="slider"></span>
+                </label>
+                <!--アラートを表示-->
+                <span class="label-text">Show Alert</span>
+            </div>
+
+            <div class="setting-item">
+                <button id="themeToggleBtn" class="theme-toggle">
+                    <i class="fa-solid fa-sun icon sun"></i>
+                    <i class="fa-solid fa-moon icon moon"></i>
+                </button>
+                <!--テーマ-->
+                <span class="label-text">Theme</span>
+            </div>
+
+            <div class="setting-item">
+                <label class="switch">
+                    <input type="checkbox" id="enableAddBalls">
+                    <span class="slider"></span>
+                </label>
+                <!--ボールの追加を有効にする-->
+                <span class="label-text">Enable Add Ball</span>
+            </div>
+
+            <div class="setting-item">
+                <label class="switch">
+                    <input type="checkbox" id="enableFeaturesBtn">
+                    <span class="slider"></span>
+                </label>
+                <!--フィーチャーボタンを表示-->
+                <span class="label-text">Show Feature Buttons</span>
+            </div>
+
+            <div class="setting-item">
+                <label class="switch">
+                    <input type="checkbox" id="enableHideShowBtn">
+                    <span class="slider"></span>
+                </label>
+                <!--非表示/表示ボタンを表示-->
+                <span class="label-text">Show Hide/Show Button</span>
+            </div>
+
+            <div class="setting-item">
+                <label class="switch">
+                    <input type="checkbox" id="enableGravityBtn" checked>
+                    <span class="slider"></span>
+                </label>
+                <!--重力ボタンを表示-->
+                <span class="label-text">Show Gravity Button</span>
+            </div>
+
+			      <div class="setting-item">
+    			      <label class="switch">
+        			      <input type="checkbox" id="airResistanceToggle">
+        			      <span class="slider"></span>
+    		      	</label>
+    			      <span class="label-text">Disable Air Resistance</span>
+			      </div>
+
+            <div class="setting-item">
+                <label class="switch">
+                    <input type="checkbox" id="enableSearchTabBtn">
+                    <span class="slider"></span>
+                </label>
+                <span class="label-text">Show Search Tab Button</span>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <button class="duo-button">やったー!</button>
+            
+            <button id="addBallBtn" class="ball-menu-btn" style="display: none;">
+                <i class="fa-solid fa-circle-plus"></i> Add Ball
+            </button>
+
+            <button id="featuresBtn" class="ball-menu-btn" style="display: none;">
+                <i class="fa-solid fa-info-circle"></i> Features
+            </button>
+
+            <button id="hideShowBtn" class="ball-menu-btn" style="display: none;">
+                Hide
+            </button>
+
+            <button id="gravityBtn" class="ball-menu-btn">
+                <i class="fa-solid fa-globe"></i> <span id="gravityText">Gravity: On</span>
+            </button>
+
+            <button id="searchTabBtn" class="ball-menu-btn" style="display: none;">
+                <i class="fa-solid fa-search"></i> Open Search Tab
+            </button>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.1/dist/sweetalert2.min.js"></script>
+        <script src="interaction.js"></script>
+    </body>
+</html>
