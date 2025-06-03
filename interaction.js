@@ -488,127 +488,135 @@ function absorbBall(big, small, balls, smallIndex) {
 
 updateBalls();
 
-// Search Tab Button Toggle
+// Search Button Toggle
 const enableSearchTabBtn = document.getElementById('enableSearchTabBtn');
 const searchTabBtn = document.getElementById('searchTabBtn');
 
 enableSearchTabBtn.addEventListener('change', () => {
-  searchTabBtn.style.display = enableSearchTabBtn.checked ? 'inline-block' : 'none';
+    searchTabBtn.style.display = enableSearchTabBtn.checked ? 'inline-block' : 'none';
 });
 
-// Search Tab Window
+// Search Tab
 searchTabBtn.addEventListener('click', () => {
-  // Check if a tab already exists
-  let searchTab = document.querySelector('.search-tab');
-  if (searchTab) {
-    searchTab.style.display = 'flex'; // Show if hidden
-    return;
-  }
-
-  // Create macOS-style window
-  searchTab = document.createElement('div');
-  searchTab.className = 'search-tab';
-  searchTab.innerHTML = `
-    <div class="search-tab-header">
-      <div class="search-tab-buttons">
-        <button class="search-tab-button close"></button>
-        <button class="search-tab-button minimize"></button>
-        <button class="search-tab-button maximize"></button>
-      </div>
-    </div>
-    <div class="search-tab-content">
-      <iframe src="https://www.bing.com/" title="Bing Search"></iframe>
-    </div>
-  `;
-  document.body.appendChild(searchTab);
-
-  // Make the window draggable
-  makeWindowDraggable(searchTab);
-
-  // Handle window buttons
-  const closeBtn = searchTab.querySelector('.close');
-  const minimizeBtn = searchTab.querySelector('.minimize');
-  const maximizeBtn = searchTab.querySelector('.maximize');
-
-  closeBtn.addEventListener('click', () => {
-    searchTab.remove();
-  });
-
-  minimizeBtn.addEventListener('click', () => {
-    searchTab.style.display = 'none';
-  });
-
-  maximizeBtn.addEventListener('click', () => {
-    if (searchTab.style.width === '100%' && searchTab.style.height === '100%') {
-      searchTab.style.width = '80%';
-      searchTab.style.maxWidth = '800px';
-      searchTab.style.height = '60%';
-      searchTab.style.maxHeight = '600px';
-      searchTab.style.top = '50%';
-      searchTab.style.left = '50%';
-      searchTab.style.transform = 'translate(-50%, -50%)';
-    } else {
-      searchTab.style.width = '100%';
-      searchTab.style.maxWidth = 'none';
-      searchTab.style.height = '100%';
-      searchTab.style.maxHeight = 'none';
-      searchTab.style.top = '0';
-      searchTab.style.left = '0';
-      searchTab.style.transform = 'none';
+    let searchTab = document.querySelector('.search-tab');
+    if (searchTab) {
+        searchTab.style.display = 'flex';
+        return;
     }
-  });
+
+    searchTab = document.createElement('div');
+    searchTab.className = 'search-tab';
+    searchTab.innerHTML = `
+        <div class="search-tab-header">
+            <div class="search-tab-buttons">
+                <button class="search-tab-button close"></button>
+                <button class="search-tab-button minimize"></button>
+                <button class="search-tab-button maximize"></button>
+            </div>
+        </div>
+        <div class="search-tab-content">
+            <iframe src="search.html" title="Google Search"></iframe>
+        </div>
+    `;
+    document.body.appendChild(searchTab);
+
+    makeWindowDraggable(searchTab);
+
+    const closeBtn = searchTab.querySelector('.close');
+    const minimizeBtn = searchTab.querySelector('.minimize');
+    const maximizeBtn = searchTab.querySelector('.maximize');
+
+    closeBtn.addEventListener('click', () => {
+        searchTab.remove();
+    });
+
+    minimizeBtn.addEventListener('click', () => {
+        searchTab.style.display = 'none';
+    });
+
+    maximizeBtn.addEventListener('click', () => {
+        if (searchTab.style.width === '100%') {
+            searchTab.style.width = '80%';
+            searchTab.style.maxWidth = '800px';
+            searchTab.style.height = '60%';
+            searchTab.style.maxHeight = '600px';
+            searchTab.style.top = '50%';
+            searchTab.style.left = '50%';
+            searchTab.style.transform = 'translate(-50%, -50%)';
+        } else {
+            searchTab.style.width = '100%';
+            searchTab.style.maxWidth = 'none';
+            searchTab.style.height = '100%';
+            searchTab.style.maxHeight = 'none';
+            searchTab.style.top = '0';
+            searchTab.style.left = '0';
+            searchTab.style.transform = 'none';
+        }
+    });
+
+    // Handle Enter key in search form
+    const searchFrame = searchTab.querySelector('iframe');
+    searchFrame.addEventListener('load', () => {
+        const frameDoc = searchFrame.contentDocument || searchFrame.contentWindow.document;
+        const searchInput = frameDoc.querySelector('#mySearch');
+        const searchForm = frameDoc.querySelector('form');
+
+        if (searchInput && searchForm) {
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && searchInput.value.trim()) {
+                    e.preventDefault();
+                    searchForm.submit();
+                }
+            });
+        }
+    });
 });
 
-// Make window draggable
+// Draggable Window (corrected)
 function makeWindowDraggable(el) {
-  let offsetX = 0, offsetY = 0;
-  const header = el.querySelector('.search-tab-header');
+    let offsetX = 0, offsetY = 0;
+    const header = el.querySelector('.search-tab-header');
 
-  header.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-    offsetX = e.clientX - parseFloat(el.style.left || window.innerWidth / 2);
-    offsetY = e.clientY - parseFloat(el.style.top || window.innerHeight / 2);
-    el.isDragging = true;
-  });
+    header.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        offsetX = e.clientX - parseFloat(el.style.left || window.innerWidth / 2);
+        offsetY = e.clientY - parseFloat(el.style.top || window.innerHeight / 2);
+        el.isDragging = true;
+    });
 
-  document.addEventListener('mousemove', (e) => {
-    if (el.isDragging) {
-      const x = e.clientX - offsetX;
-      const y = e.clientY - offsetY;
-      el.style.left = `${x}px`;
-      el.style.top = `${y}px`;
-      el.style.transform = 'none'; // Override centering transform
-    }
-  });
+    document.addEventListener('mousemove', (e) => {
+        if (el.isDragging) {
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.style.transform = 'none';
+        }
+    });
 
-  document.addEventListener('mouseup', () => {
-    el.isDragging = false;
-  });
+    document.addEventListener('mouseup', () => {
+        el.isDragging = false;
+    });
 
-  header.addEventListener('touchstart', (e) => {
-    if (e.cancelable) {
-      e.preventDefault();
-    }
-    offsetX = e.touches[0].clientX - parseFloat(el.style.left || window.innerWidth / 2);
-    offsetY = e.touches[0].clientY - parseFloat(el.style.top || window.innerHeight / 2);
-    el.isDragging = true;
-  });
+    header.addEventListener('touchstart', (e) => {
+        if (e.cancelable) e.preventDefault();
+        offsetX = e.touches[0].clientX - parseFloat(el.style.left || window.innerWidth / 2);
+        offsetY = e.touches[0].clientY - parseFloat(el.style.top || window.innerHeight / 2);
+        el.isDragging = true;
+    });
 
-  header.addEventListener('touchmove', (e) => {
-    if (e.cancelable) {
-      e.preventDefault();
-    }
-    if (el.isDragging) {
-      const x = e.touches[0].clientX - offsetX;
-      const y = e.touches[0].clientY - offsetY;
-      el.style.left = `${x}px`;
-      el.style.top = `${y}px`;
-      el.style.transform = 'none'; // Override centering transform
-    }
-  });
+    header.addEventListener('touchmove', (e) => {
+        if (e.cancelable) e.preventDefault();
+        if (el.isDragging) {
+            const x = e.touches[0].clientX - offsetX;
+            const y = e.touches[0].clientY - offsetY;
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.style.transform = 'none';
+        }
+    });
 
-  header.addEventListener('touchend', () => {
-    el.isDragging = false;
-  });
+    header.addEventListener('touchend', () => {
+        el.isDragging = false;
+    });
 }
-
