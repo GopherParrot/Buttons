@@ -1,4 +1,4 @@
-Swal.fire("The Google search engine was created by Aakaanksha—credit goes to her for this incredible tool! Thanks a lot!").then((result) => {
+reallySwal.fire("The Google search engine was created by Aakaanksha—credit goes to her for this incredible tool! Thanks a lot!").then((result) => {
 	Swal.fire("If you hold the button, the alert won't trigger... or just go to settings and disable it ^_^\n\n...Btw you don't need to understand the japanese text, it's not important :)");
 });
 
@@ -491,7 +491,7 @@ function absorbBall(big, small, balls, smallIndex) {
 
 updateBalls();
 
-// Ensure these elements exist in your HTML
+// Search tab
 const enableSearchTabBtn = document.getElementById('enableSearchTabBtn');
 const searchTabBtn = document.getElementById('searchTabBtn');
 
@@ -500,16 +500,15 @@ if (enableSearchTabBtn && searchTabBtn) {
         searchTabBtn.style.display = enableSearchTabBtn.checked ? 'inline-block' : 'none';
     });
 
-    searchTabBtn.addEventListener('click', () => {
+    searchTabBtn.addEventListener('click', () => { // This click is for the main button to show the tab
         let searchTab = document.querySelector('.search-tab');
         if (searchTab) {
-            searchTab.style.display = 'flex'; // Ensure it's flex when shown
+            searchTab.style.display = 'flex';
             return;
         }
 
         searchTab = document.createElement('div');
         searchTab.className = 'search-tab';
-        // Initial style should ideally be in CSS, but mirroring original logic
         searchTab.style.top = '50%';
         searchTab.style.left = '50%';
         searchTab.style.transform = 'translate(-50%, -50%)';
@@ -517,8 +516,8 @@ if (enableSearchTabBtn && searchTabBtn) {
         searchTab.style.maxWidth = '800px';
         searchTab.style.height = '60%';
         searchTab.style.maxHeight = '600px';
-        // Add other necessary styles if not fully covered by CSS class .search-tab
-        // e.g., searchTab.style.position = 'fixed';
+        // For a complete example, ensure necessary base styles are applied here or in CSS
+        // searchTab.style.position = 'fixed';
         // searchTab.style.backgroundColor = '#fff';
         // searchTab.style.border = '1px solid #ccc';
         // searchTab.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
@@ -530,11 +529,11 @@ if (enableSearchTabBtn && searchTabBtn) {
 
 
         searchTab.innerHTML = `
-            <div class="search-tab-header" style="cursor: move; background-color: #f1f1f1; padding: 10px; border-bottom: 1px solid #ccc; display: flex; justify-content: flex-start; align-items: center;">
+            <div class="search-tab-header" style="cursor: move; background-color: #f1f1f1; padding: 10px; border-bottom: 1px solid #ccc; display: flex; justify-content: flex-start; align-items: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
                 <div class="search-tab-buttons" style="display: flex;">
-                    <button class="search-tab-button close" style="background-color: #ff5f57; border-radius: 50%; width: 12px; height: 12px; border: none; margin-right: 8px; padding: 0;"></button>
-                    <button class="search-tab-button minimize" style="background-color: #ffbd2e; border-radius: 50%; width: 12px; height: 12px; border: none; margin-right: 8px; padding: 0;"></button>
-                    <button class="search-tab-button maximize" style="background-color: #28c940; border-radius: 50%; width: 12px; height: 12px; border: none; padding: 0;"></button>
+                    <button class="search-tab-button close" style="background-color: #ff5f57; border-radius: 50%; width: 12px; height: 12px; border: none; margin-right: 8px; padding: 0; display:block;"></button>
+                    <button class="search-tab-button minimize" style="background-color: #ffbd2e; border-radius: 50%; width: 12px; height: 12px; border: none; margin-right: 8px; padding: 0; display:block;"></button>
+                    <button class="search-tab-button maximize" style="background-color: #28c940; border-radius: 50%; width: 12px; height: 12px; border: none; padding: 0; display:block;"></button>
                 </div>
                 <span style="margin-left: auto; font-weight: bold; user-select: none;">Search</span>
             </div>
@@ -544,31 +543,25 @@ if (enableSearchTabBtn && searchTabBtn) {
         `;
         document.body.appendChild(searchTab);
 
-        makeWindowDraggableAndResizable(searchTab);
-
         const closeBtn = searchTab.querySelector('.search-tab-button.close');
         const minimizeBtn = searchTab.querySelector('.search-tab-button.minimize');
         const maximizeBtn = searchTab.querySelector('.search-tab-button.maximize');
         const headerElement = searchTab.querySelector('.search-tab-header');
 
-        // Ensure buttons are easily tappable on mobile:
-        // Adding some padding via JS if CSS isn't sufficient.
-        // Best practice is to handle this in CSS with appropriate padding/min-width/min-height.
-        [closeBtn, minimizeBtn, maximizeBtn].forEach(btn => {
-            if (btn) {
-                // btn.style.padding = '8px'; // Example: increase tappable area if needed
-            }
-        });
 
-
+        // --- Button Event Listeners ---
+        // Using 'click' should generally work, but for mobile, ensuring no interference is key.
+        // The fix in makeWindowDraggableAndResizable should help.
         if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event from bubbling up further
                 searchTab.remove();
             });
         }
 
         if (minimizeBtn) {
-            minimizeBtn.addEventListener('click', () => {
+            minimizeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 searchTab.style.display = 'none';
             });
         }
@@ -577,9 +570,9 @@ if (enableSearchTabBtn && searchTabBtn) {
         let previousDimensions = {};
 
         if (maximizeBtn) {
-            maximizeBtn.addEventListener('click', () => {
+            maximizeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 if (!isMaximized) {
-                    // Store current dimensions and position before maximizing
                     previousDimensions = {
                         width: searchTab.style.width,
                         height: searchTab.style.height,
@@ -589,21 +582,20 @@ if (enableSearchTabBtn && searchTabBtn) {
                         maxWidth: searchTab.style.maxWidth,
                         maxHeight: searchTab.style.maxHeight,
                     };
-
-                    searchTab.style.width = '100%';
-                    searchTab.style.maxWidth = 'none';
-                    searchTab.style.height = '100%';
-                    searchTab.style.maxHeight = 'none';
+                    searchTab.style.width = '100vw'; // Use vw/vh for true fullscreen
+                    searchTab.style.maxWidth = '100vw';
+                    searchTab.style.height = '100vh';
+                    searchTab.style.maxHeight = '100vh';
                     searchTab.style.top = '0px';
                     searchTab.style.left = '0px';
                     searchTab.style.transform = 'none';
+                    searchTab.style.borderRadius = '0px';
+                    if(headerElement) {
+                        headerElement.style.borderTopLeftRadius = '0px';
+                        headerElement.style.borderTopRightRadius = '0px';
+                    }
                     isMaximized = true;
-                    if(headerElement) headerElement.style.borderRadius = '0'; // Optional: remove border radius when maximized
-                    searchTab.style.borderRadius = '0';
-
-
                 } else {
-                    // Restore to previous or default dimensions
                     searchTab.style.width = previousDimensions.width || '80%';
                     searchTab.style.maxWidth = previousDimensions.maxWidth || '800px';
                     searchTab.style.height = previousDimensions.height || '60%';
@@ -611,22 +603,27 @@ if (enableSearchTabBtn && searchTabBtn) {
                     searchTab.style.top = previousDimensions.top || '50%';
                     searchTab.style.left = previousDimensions.left || '50%';
                     searchTab.style.transform = previousDimensions.transform || 'translate(-50%, -50%)';
+                    searchTab.style.borderRadius = '8px';
+                     if(headerElement) {
+                        headerElement.style.borderTopLeftRadius = '8px';
+                        headerElement.style.borderTopRightRadius = '8px';
+                    }
                     isMaximized = false;
-                     if(headerElement) headerElement.style.borderTopLeftRadius = '8px'; // Restore
-                     if(headerElement) headerElement.style.borderTopRightRadius = '8px';
-                     searchTab.style.borderRadius = '8px';
                 }
             });
         }
+        
+        // Call this after buttons are defined so it can potentially reference them if needed
+        makeWindowDraggableAndResizable(searchTab);
 
-        // Handle Enter key in search form
+
         const searchFrame = searchTab.querySelector('iframe');
         if (searchFrame) {
             searchFrame.addEventListener('load', () => {
                 try {
                     const frameDoc = searchFrame.contentDocument || searchFrame.contentWindow.document;
-                    const searchInput = frameDoc.querySelector('#mySearch'); // Ensure this ID matches your search.html
-                    const searchForm = frameDoc.querySelector('form'); // Ensure this matches your search.html
+                    const searchInput = frameDoc.querySelector('#mySearch');
+                    const searchForm = frameDoc.querySelector('form');
 
                     if (searchInput && searchForm) {
                         searchInput.addEventListener('keydown', (e) => {
@@ -647,7 +644,6 @@ if (enableSearchTabBtn && searchTabBtn) {
 }
 
 
-// Draggable and Resizable Window
 function makeWindowDraggableAndResizable(el) {
     const header = el.querySelector('.search-tab-header');
     if (!header) {
@@ -658,91 +654,101 @@ function makeWindowDraggableAndResizable(el) {
     let offsetX = 0, offsetY = 0;
     let initialMouseX, initialMouseY, initialWidth, initialHeight, initialLeft, initialTop;
     let isDragging = false;
-    let resizeDirection = null;
-    const resizeHandleSize = 10; // Pixels for resize detection area
-    const minWidth = 200; // Minimum width for the window
-    const minHeight = 150; // Minimum height for the window
+    let isResizing = false; // Changed from resizeDirection to boolean
+    let currentResizeEdge = null; // Stores N, S, E, W, NW, NE, SW, SE
 
-    // Function to determine which edge/corner is being targeted for resize
-    function getResizeDirection(clientX, clientY, rect) {
-        let dir = '';
-        // Check N, S, W, E proximity
-        if (clientY - rect.top < resizeHandleSize && clientY - rect.top > -resizeHandleSize) dir += 'N'; // Allow grabbing from slightly outside too
-        else if (rect.bottom - clientY < resizeHandleSize && rect.bottom - clientY > -resizeHandleSize) dir += 'S';
-        
-        if (clientX - rect.left < resizeHandleSize && clientX - rect.left > -resizeHandleSize) dir += 'W';
-        else if (rect.right - clientX < resizeHandleSize && rect.right - clientX > -resizeHandleSize) dir += 'E';
+    const resizeHandleSize = 15; // Increased for better touch accuracy
+    const minWidth = 200;
+    const minHeight = 150;
 
-        // Prioritize corners
-        if (dir.includes('N') && dir.includes('W')) return 'NW';
-        if (dir.includes('N') && dir.includes('E')) return 'NE';
-        if (dir.includes('S') && dir.includes('W')) return 'SW';
-        if (dir.includes('S') && dir.includes('E')) return 'SE';
+    function getResizeEdge(clientX, clientY, rect) {
+        let edge = '';
+        const onTopEdge = clientY - rect.top < resizeHandleSize && clientY - rect.top > -resizeHandleSize / 2; // Allow grabbing from slightly outside
+        const onBottomEdge = rect.bottom - clientY < resizeHandleSize && rect.bottom - clientY > -resizeHandleSize / 2;
+        const onLeftEdge = clientX - rect.left < resizeHandleSize && clientX - rect.left > -resizeHandleSize / 2;
+        const onRightEdge = rect.right - clientX < resizeHandleSize && rect.right - clientX > -resizeHandleSize / 2;
+
+        if (onTopEdge) edge += 'N';
+        else if (onBottomEdge) edge += 'S';
+
+        if (onLeftEdge) edge += 'W';
+        else if (onRightEdge) edge += 'E';
         
-        // Return single direction if not a corner
-        if (dir.includes('N')) return 'N';
-        if (dir.includes('S')) return 'S';
-        if (dir.includes('W')) return 'W';
-        if (dir.includes('E')) return 'E';
-        
-        return null; // No resize area
+        return edge || null;
     }
-
-    // Function to update cursor style based on potential action
+    
     function updateCursor(clientX, clientY) {
-        if (isDragging || resizeDirection) return; // Don't change cursor if an action is in progress
+        if (isDragging || isResizing) return;
 
         const rect = el.getBoundingClientRect();
-        const currentResizeDir = getResizeDirection(clientX, clientY, rect);
-        
-        if (el.style.width === '100%' || el.style.height === '100%') { // If maximized
+        // Do not allow resizing if maximized
+        if (el.style.width === '100vw' || el.style.height === '100vh' || el.style.width === '100%' || el.style.height === '100%') {
             el.style.cursor = 'default';
-            header.style.cursor = 'move'; // Keep header draggable
+            header.style.cursor = 'move';
             return;
         }
+        
+        currentResizeEdge = getResizeEdge(clientX, clientY, rect);
 
-        if (currentResizeDir) {
-            if (currentResizeDir === 'N' || currentResizeDir === 'S') el.style.cursor = 'ns-resize';
-            else if (currentResizeDir === 'E' || currentResizeDir === 'W') el.style.cursor = 'ew-resize';
-            else if (currentResizeDir === 'NW' || currentResizeDir === 'SE') el.style.cursor = 'nwse-resize';
-            else if (currentResizeDir === 'NE' || currentResizeDir === 'SW') el.style.cursor = 'nesw-resize';
-            header.style.cursor = 'move'; // Ensure header is still 'move'
+        if (currentResizeEdge) {
+            if ((currentResizeEdge === 'N') || (currentResizeEdge === 'S')) el.style.cursor = 'ns-resize';
+            else if ((currentResizeEdge === 'E') || (currentResizeEdge === 'W')) el.style.cursor = 'ew-resize';
+            else if ((currentResizeEdge === 'NW') || (currentResizeEdge === 'SE')) el.style.cursor = 'nwse-resize';
+            else if ((currentResizeEdge === 'NE') || (currentResizeEdge === 'SW')) el.style.cursor = 'nesw-resize';
+            else el.style.cursor = 'default'; // Should not happen if currentResizeEdge is true
+            header.style.cursor = 'move';
         } else {
             el.style.cursor = 'default';
             header.style.cursor = 'move';
         }
     }
     
-    // Attach mousemove to the element itself for cursor updates when not actively dragging/resizing
-    el.addEventListener('mousemove', (e) => {
-        updateCursor(e.clientX, e.clientY);
-    });
-    el.addEventListener('mouseleave', () => { // Reset cursor when mouse leaves the element
-        if (!isDragging && !resizeDirection) {
-            el.style.cursor = 'default';
-            header.style.cursor = 'move';
+    el.addEventListener('mousemove', (e) => { // For desktop cursor updates
+        if (e.buttons === 0) { // Only update if no mouse button is pressed
+             updateCursor(e.clientX, e.clientY);
         }
     });
-
+    el.addEventListener('mouseleave', () => {
+        if (!isDragging && !isResizing) {
+            el.style.cursor = 'default';
+        }
+    });
 
     function onStart(e) {
-        // Determine if it's a touch event
         const isTouchEvent = e.type.startsWith('touch');
-        const clientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
-        const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
+        const targetElement = e.target;
 
-        const rect = el.getBoundingClientRect();
+        // *** CRITICAL FIX FOR BUTTONS ON MOBILE ***
+        // If the event target is one of the control buttons, do nothing here.
+        // Let the button's own 'click' (or touchend) listener handle it.
+        if (targetElement.classList.contains('search-tab-button')) {
+            // console.log("Button clicked, ignoring drag/resize start.");
+            return; 
+        }
         
-        // Check for resize only if not maximized
-        if (el.style.width !== '100%' && el.style.height !== '100%') {
-            resizeDirection = getResizeDirection(clientX, clientY, rect);
-        } else {
-            resizeDirection = null; // No resizing if maximized
+        // If the touch/click is on a scrollbar of the iframe, ignore.
+        // This is a basic check; more robust scrollbar detection can be complex.
+        if (targetElement.tagName === 'IFRAME' && (e.offsetX > targetElement.clientWidth || e.offsetY > targetElement.clientHeight)) {
+            // console.log("Likely scrollbar interaction, ignoring.")
+            return;
         }
 
-        if (resizeDirection) {
-            if (e.cancelable && isTouchEvent) e.preventDefault(); // Prevent page scroll on touch for resize
-            isDragging = false; // Ensure not also dragging
+
+        const clientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
+        const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
+        const rect = el.getBoundingClientRect();
+
+        // Check for resize only if not maximized
+        if (el.style.width !== '100vw' && el.style.height !== '100vh' && el.style.width !== '100%' && el.style.height !== '100%') {
+             currentResizeEdge = getResizeEdge(clientX, clientY, rect);
+        } else {
+            currentResizeEdge = null;
+        }
+
+        if (currentResizeEdge) {
+            isResizing = true;
+            isDragging = false;
+            if (isTouchEvent && e.cancelable) e.preventDefault();
 
             initialMouseX = clientX;
             initialMouseY = clientY;
@@ -751,36 +757,33 @@ function makeWindowDraggableAndResizable(el) {
             initialLeft = rect.left;
             initialTop = rect.top;
 
-            // Convert to pixel positioning if not already
             el.style.width = `${initialWidth}px`;
             el.style.height = `${initialHeight}px`;
             el.style.left = `${initialLeft}px`;
             el.style.top = `${initialTop}px`;
             el.style.transform = 'none';
-            el.style.maxWidth = 'none'; // Allow free resize
+            el.style.maxWidth = 'none';
             el.style.maxHeight = 'none';
 
-        } else if (header.contains(e.target) || e.target === header) {
-            if (e.cancelable && isTouchEvent) e.preventDefault(); // Prevent page scroll on touch for drag
+        } else if (header.contains(targetElement) || targetElement === header) {
             isDragging = true;
-            resizeDirection = null; // Ensure not also resizing
-
-            // Calculate offset from the element's current screen position
+            isResizing = false;
+            if (isTouchEvent && e.cancelable) e.preventDefault();
+            
             offsetX = clientX - rect.left;
             offsetY = clientY - rect.top;
 
-            // Set position explicitly in pixels and remove transform for smooth dragging
             el.style.left = `${rect.left}px`;
             el.style.top = `${rect.top}px`;
-            el.style.transform = 'none';
+            el.style.transform = 'none'; // Important for smooth dragging
         } else {
-            return; // Click was not on header or resize handle
+            return; // Not on header or resize handle
         }
 
-        // Add global listeners for move and end events
         if (isTouchEvent) {
             document.addEventListener('touchmove', onMove, { passive: false });
             document.addEventListener('touchend', onEnd);
+            document.addEventListener('touchcancel', onEnd); // Handle interruptions
         } else {
             document.addEventListener('mousemove', onMove);
             document.addEventListener('mouseup', onEnd);
@@ -789,12 +792,12 @@ function makeWindowDraggableAndResizable(el) {
 
     function onMove(e) {
         const isTouchEvent = e.type.startsWith('touch');
-        if (e.cancelable && isTouchEvent) e.preventDefault();
+        if (isTouchEvent && e.cancelable) e.preventDefault();
 
         const clientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
         const clientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
 
-        if (resizeDirection) {
+        if (isResizing && currentResizeEdge) {
             let newWidth = initialWidth;
             let newHeight = initialHeight;
             let newLeft = initialLeft;
@@ -803,24 +806,23 @@ function makeWindowDraggableAndResizable(el) {
             const deltaX = clientX - initialMouseX;
             const deltaY = clientY - initialMouseY;
 
-            if (resizeDirection.includes('E')) newWidth = initialWidth + deltaX;
-            if (resizeDirection.includes('W')) {
+            if (currentResizeEdge.includes('E')) newWidth = initialWidth + deltaX;
+            if (currentResizeEdge.includes('W')) {
                 newWidth = initialWidth - deltaX;
                 newLeft = initialLeft + deltaX;
             }
-            if (resizeDirection.includes('S')) newHeight = initialHeight + deltaY;
-            if (resizeDirection.includes('N')) {
+            if (currentResizeEdge.includes('S')) newHeight = initialHeight + deltaY;
+            if (currentResizeEdge.includes('N')) {
                 newHeight = initialHeight - deltaY;
                 newTop = initialTop + deltaY;
             }
             
-            // Apply minimum dimensions
             if (newWidth < minWidth) {
-                if (resizeDirection.includes('W')) newLeft = newLeft - (minWidth - newWidth);
+                if (currentResizeEdge.includes('W')) newLeft = newLeft - (minWidth - newWidth);
                 newWidth = minWidth;
             }
             if (newHeight < minHeight) {
-                if (resizeDirection.includes('N')) newTop = newTop - (minHeight - newHeight);
+                if (currentResizeEdge.includes('N')) newTop = newTop - (minHeight - newHeight);
                 newHeight = minHeight;
             }
 
@@ -837,31 +839,34 @@ function makeWindowDraggableAndResizable(el) {
 
     function onEnd(e) {
         const isTouchEvent = e.type.startsWith('touch');
-
         isDragging = false;
-        resizeDirection = null;
-        // Reset cursor to default or move for header
-        el.style.cursor = 'default';
-        header.style.cursor = 'move';
+        isResizing = false;
+        currentResizeEdge = null;
+        
+        // Update cursor based on final position if it's a mouse event
+        if (!isTouchEvent && e) { // e might be undefined for touchcancel
+            updateCursor(e.clientX, e.clientY);
+        } else { // For touch, or if e is undefined, reset to default
+            el.style.cursor = 'default';
+            header.style.cursor = 'move';
+        }
 
 
         if (isTouchEvent) {
             document.removeEventListener('touchmove', onMove);
             document.removeEventListener('touchend', onEnd);
+            document.removeEventListener('touchcancel', onEnd);
         } else {
             document.removeEventListener('mousemove', onMove);
             document.removeEventListener('mouseup', onEnd);
         }
     }
 
-    // Attach mousedown/touchstart to the header for dragging
-    header.addEventListener('mousedown', onStart);
-    header.addEventListener('touchstart', onStart, { passive: false }); // passive:false to allow preventDefault
-
-    // Attach mousedown/touchstart to the element itself for resizing
-    // This allows detection of clicks near edges but outside the header
+    // Listen on the element itself for resize starts, and header for drag starts.
+    // This order helps prioritize: if it's a button, it's handled. If not, then check resize, then drag.
     el.addEventListener('mousedown', onStart);
     el.addEventListener('touchstart', onStart, { passive: false });
+    // Header listeners are technically redundant if el listener is smart enough, but can be kept for clarity
+    // header.addEventListener('mousedown', onStart); 
+    // header.addEventListener('touchstart', onStart, { passive: false });
 }
-
-
