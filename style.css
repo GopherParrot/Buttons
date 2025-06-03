@@ -7,6 +7,7 @@ I read a book called "HTML for babies" :)
     font-family: zen kurenaido;
     -webkit-tap-highlight-color: transparent;
 }
+
 body {
     display: flex;
     justify-content: center;
@@ -14,6 +15,89 @@ body {
     height: 70vh;
     background: #f0f4f8;
 }
+
+#enableSearchTabBtn {
+    margin: 10px; 
+}
+
+#searchTabBtn { 
+    margin: 10px; 
+    padding: 8px 15px;
+    cursor: pointer; 
+}
+
+.search-tab {
+    position: fixed;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    overflow: hidden;
+    min-width: 200px; // corresponds to JS minWidth
+    min-height: 150px; // corresponds to JS minHeight
+}
+
+.search-tab-header {
+    cursor: move;
+    background-color: #f1f1f1;
+    padding: 8px 12px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-start; //buttons to the left
+    align-items: center;
+    user-select: none; // prevent text selection when dragging header
+    height: 40px; // example fixed height
+    box-sizing: border-box;
+    border-top-left-radius: 8px; // match parent
+    border-top-right-radius: 8px; // match parent
+}
+
+.search-tab-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.search-tab-button { // Basic styling, ensure these are large enough for touch
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    border: none;
+    margin-right: 8px;
+    padding: 0; // Remove default padding
+    display: block; // Or inline-block
+    cursor: pointer;
+    // For better touch targets, consider increasing size or using transparent padding:
+    // min-width: 24px; 
+    // min-height: 24px;
+    // background-clip: content-box; // If using padding to increase area but keep visual small
+}
+.search-tab-button.close { background-color: #ff5f57; }
+.search-tab-button.minimize { background-color: #ffbd2e; }
+.search-tab-button.maximize { background-color: #28c940; }
+
+.search-tab-header span { // Title text
+    margin-left: auto; // Pushes title to the right of buttons
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.search-tab-content {
+    flex-grow: 1; // Allows content to fill remaining space
+    overflow: hidden; // Important for iframe
+    background-color: #fff; // Ensure content area has a background
+}
+
+.search-tab-content iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+*/
+
 
 main-container {
     height: 100vh;
