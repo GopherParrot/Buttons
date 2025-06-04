@@ -89,10 +89,13 @@ featuresBtn.addEventListener('click', () => {
         <li><b>Balls</b>: Enable in settings, then click "Add Ball" to create a ball with a chosen color and size.</li>
         <li><b>An alert</b>: Just a simple alert, aka "SweetAlert".</li>
         <li><b>Drag Balls</b>: Click or touch and drag to move balls.</li>
-        <li><b>Delete Balls</b>: Hold a ball (500ms) to prompt a "Delete?" alert with Cancel/Delete options.</li>
+        <li><b>Delete Balls</b>: Hold a ball (500ms) to prompt a "Delete?" alert with Delete options.</li>
         <li><b>Theme Toggle</b>: Switch between light and dark mode in settings.</li>
         <li><b>Hide/Show</b>: Enable in settings, then click "Hide" to hide everything except settings, balls and the button itself, or "Show" to restore.</li>
         <li><b>Gravity</b>: Click "Gravity: On/Off" to toggle gravity for all baaaaaaaalllllsssszzzz.</li>
+	<li><b>Search Tab</b>: A small tab, resizable, with the UI inspired by MacOS style. Red button: Delete the tab; Yellow button: Close the tab; Green button: Zoom in/out the tab.</li>
+        <li><b>Setting</b>: Note that it's scrollable, so you might miss some cool switches that are hidden inside :)</li>
+	<li><b>Disable air resistance</b>: No air resistance, ball(s) won't stop moving.</li>
       </ul>
     `,
     icon: 'info',
