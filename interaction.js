@@ -217,23 +217,55 @@ function createBall(color, size) {
 
 function updateBalls() {
   balls.forEach((ball, i) => {
-    const rect = ball.getBoundingClientRect();
-    
-    // Only apply physics if not being dragged and gravity is enabled
-    if (!ball.isDragging) {
-      if (gravityEnabled) {
-        ball.velocity.y += ball.gravity;
-      }
+    if (ball.isDragging || ball.style.display === 'none') return;
 
-      // Update position based on velocity
-      let newTop = rect.top + ball.velocity.y;
-      let newLeft = rect.left + ball.velocity.x;
-      
-      // Boundary collisions (walls, floor, ceiling)
-      // ... (keep your existing boundary collision code)
+    const rect = ball.getBoundingClientRect();
+    if (gravityEnabled) {
+      ball.velocity.y += ball.gravity;
     }
 
-    // Check collisions with other balls - IMPORTANT: do this even for dragged balls!
+    let newTop = rect.top + ball.velocity.y;
+    let newLeft = rect.left + ball.velocity.x;
+    
+// == some collision i think that's cool... or maybe not ==
+
+    // top collision
+    if (newTop <= 0) {
+      newTop = 0;
+      ball.velocity.y *= -ball.bounce;
+      ball.velocity.x *= ball.friction;
+    }
+
+    // floor collision
+    if (newTop + ball.size >= window.innerHeight) {
+      newTop = window.innerHeight - ball.size;
+      ball.velocity.y *= -ball.bounce;
+      ball.velocity.x *= ball.friction;
+    }
+
+    // wall collisions
+    if (newLeft <= 0) {
+      newLeft = 0;
+      ball.velocity.x *= -1;
+    } else if (newLeft + ball.size >= window.innerWidth) {
+      newLeft = window.innerWidth - ball.size;
+      ball.velocity.x *= -1;
+    }
+
+    // cap velocity
+    ball.velocity.x = Math.max(-ball.maxVelocity, Math.min(ball.maxVelocity, ball.velocity.x));
+    ball.velocity.y = Math.max(-ball.maxVelocity, Math.min(ball.maxVelocity, ball.velocity.y));
+
+    // apply friction to horizontal movement
+	if (!airResistanceDisabled) {
+    	ball.velocity.x *= ball.friction;
+	}
+
+    // prevent NaN or undefined positions
+    ball.style.top = isNaN(newTop) ? rect.top + 'px' : newTop + 'px';
+    ball.style.left = isNaN(newLeft) ? rect.left + 'px' : newLeft + 'px';
+
+    // ... balls... collision... :)
     for (let j = i + 1; j < balls.length; j++) {
       const other = balls[j];
       if (other.style.display === 'none') continue;
@@ -244,48 +276,31 @@ function updateBalls() {
       const dx = r1.left + r1.width / 2 - (r2.left + r2.width / 2);
       const dy = r1.top + r1.height / 2 - (r2.top + r2.height / 2);
       const distance = Math.sqrt(dx * dx + dy * dy);
-      const minDistance = (r1.width / 2 + r2.width / 2);
 
-      if (distance < minDistance) {
-        // Calculate overlap
-        const overlap = minDistance - distance;
+      if (distance < (r1.width / 2 + r2.width / 2)) {
+        const nx = dx / distance || 0;
+        const ny = dy / distance || 0;
+        const dvx = ball.velocity.x - other.velocity.x;
+        const dvy = ball.velocity.y - other.velocity.y;
+        const dot = dvx * nx + dvy * ny;
+        const impulse = 1.0 * dot / 2;
+
+        ball.velocity.x -= impulse * nx;
+        ball.velocity.y -= impulse * ny;
+        other.velocity.x += impulse * nx;
+        other.velocity.y += impulse * ny;
+
+        ball.velocity.x = Math.max(-ball.maxVelocity, Math.min(ball.maxVelocity, ball.velocity.x));
+        ball.velocity.y = Math.max(-ball.maxVelocity, Math.min(ball.maxVelocity, ball.velocity.y));
+        other.velocity.x = Math.max(-other.maxVelocity, Math.min(other.maxVelocity, other.velocity.x));
+        other.velocity.y = Math.max(-other.maxVelocity, Math.min(other.maxVelocity, other.velocity.y));
+
+        const overlap = (r1.width / 2 + r2.width / 2) - distance;
         const angle = Math.atan2(dy, dx);
-        
-        // Separate the balls based on their masses (size)
-        const totalSize = ball.size + other.size;
-        const ballPushRatio = other.size / totalSize;
-        const otherPushRatio = ball.size / totalSize;
-        
-        if (!ball.isDragging) {
-          ball.style.left = (r1.left + Math.cos(angle) * overlap * ballPushRatio) + 'px';
-          ball.style.top = (r1.top + Math.sin(angle) * overlap * ballPushRatio) + 'px';
-        }
-        
-        if (!other.isDragging) {
-          other.style.left = (r2.left - Math.cos(angle) * overlap * otherPushRatio) + 'px';
-          other.style.top = (r2.top - Math.sin(angle) * overlap * otherPushRatio) + 'px';
-        }
-
-        // Only calculate velocity changes if neither ball is being dragged
-        if (!ball.isDragging && !other.isDragging) {
-          const nx = dx / distance || 0;
-          const ny = dy / distance || 0;
-          const dvx = ball.velocity.x - other.velocity.x;
-          const dvy = ball.velocity.y - other.velocity.y;
-          const dot = dvx * nx + dvy * ny;
-          const impulse = 1.0 * dot / 2;
-
-          ball.velocity.x -= impulse * nx;
-          ball.velocity.y -= impulse * ny;
-          other.velocity.x += impulse * nx;
-          other.velocity.y += impulse * ny;
-
-          // Cap velocities
-          ball.velocity.x = Math.max(-ball.maxVelocity, Math.min(ball.maxVelocity, ball.velocity.x));
-          ball.velocity.y = Math.max(-ball.maxVelocity, Math.min(ball.maxVelocity, ball.velocity.y));
-          other.velocity.x = Math.max(-other.maxVelocity, Math.min(other.maxVelocity, other.velocity.x));
-          other.velocity.y = Math.max(-other.maxVelocity, Math.min(other.maxVelocity, other.velocity.y));
-        }
+        ball.style.left = (r1.left + Math.cos(angle) * overlap / 2) + 'px';
+        ball.style.top = (r1.top + Math.sin(angle) * overlap / 2) + 'px';
+        other.style.left = (r2.left - Math.cos(angle) * overlap / 2) + 'px';
+        other.style.top = (r2.top - Math.sin(angle) * overlap / 2) + 'px';
       }
     }
   });
